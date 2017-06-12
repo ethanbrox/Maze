@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<script src=
+		"https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js">
+		</script>
+		<script src="client/js/vector.js"></script>
+		<script src="client/js/particle.js"></script>
+
+		<style>
+			html, body{
+				margin: 0px;
+			}
+
+			canvas{
+				display:block;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="canvas"></canvas>
+		
+		<script>
+		var socket = io()
+
+		window.onload = function(){
+			var canvas = document.getElementById('canvas');
+			var context = canvas.getContext('2d');
+			width = canvas.width = window.innerWidth;
+			height = canvas.height = window.innerHeight;
+			
+			update();
+			
+			document.body.addEventListener("keydown", function(event){
+				
+			});
+			
+			function update(){
+				context.clearRect(0, 0, width, height);
+				//Do stuff---------
+				
+				
+				
+				//-----------------
+				requestAnimationFrame(update);
+			}
+		};
+</script>
+	</body>
+</html>

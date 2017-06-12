@@ -1,0 +1,132 @@
+server file system is layed out as displayed
+[
+node_modules
+	express
+	socket.io
+server
+	js
+		p5.js
+		Player.js
+		game.js
+	img
+		player_sheet.png
+	index.html
+]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+EXAMPLE OF HOW TO USE EXPRESS AND SOCKET.IO {
+
+app.js
+package.json
+node_modules
+	express
+	socket.io
+server
+	serverFile1.js
+	serverFile2.js
+client
+	js
+		clientFile1.js
+		clientFile2.js
+		sharedFile1.js
+		sharedFile2.js
+	img
+		img1.png
+		img2.png
+	index.html
+	
+	
+	
+	
+File communication (Express)
+	Client asks server for a file (ex: playerImg.png)
+	
+Packege communication (Socket.io)
+	Server sends data to client (ex: Position of other player)
+		
+		
+		
+		
+		mywebsite.com	:2000		/client/playerImg.png
+URL = 	DOMAIN			PORT		PATH
+		laptop			usbport		query
+	
+	
+	
+		
+Commands:
+	navigate to project folder with cd, dir
+	npm init - initializes the install manager
+	npm install express - grabs express
+	npm install socket.io - grabs socket.io
+	
+	to start the server:
+	node app.js
+	
+	
+	
+	
+var express = require('express');
+var app = express();
+var serv = require('http').Server(app);
+
+//If the query is anything not otherwise specified do this.
+app.get('/', function(req, res){
+	res.sendFile(__dirname + '/client/index.html');
+});
+//If the server specifies something specific but it has to be in the client folder.
+app.use('/client', express.static(__dirname + '/client'));
+
+serv.listen(2000);
+
+}
+
+example of how to use socket.io
+//on one side
+socket.on('happy', function(data){
+	console.log('happy because ' + data.reason);
+});
+
+//on the other
+socket.emit('happy'{
+	reason:'its my birthday'
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
