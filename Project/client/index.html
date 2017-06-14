@@ -46,6 +46,10 @@
 				requestAnimationFrame(update);
 			}
 		};
+			
+		socket.on('players', function(data){
+			console.log(data.id);
+		});
 </script>
 	</body>
 </html>
