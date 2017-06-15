@@ -7,6 +7,8 @@
 		</script>
 		<script src="client/js/vector.js"></script>
 		<script src="client/js/particle.js"></script>
+		<script src="client/js/player.js"></script>
+
 
 		<style>
 			html, body{
@@ -23,33 +25,99 @@
 		
 		<script>
 		var socket = io()
+		var context;
+		var PLAYER;
 
 		window.onload = function(){
 			var canvas = document.getElementById('canvas');
-			var context = canvas.getContext('2d');
+			context = canvas.getContext('2d');
 			width = canvas.width = window.innerWidth;
 			height = canvas.height = window.innerHeight;
 			
 			update();
 			
-			document.body.addEventListener("keydown", function(event){
-				
-			});
-			
 			function update(){
 				context.clearRect(0, 0, width, height);
 				//Do stuff---------
-				
-				
+				if(player.id){
+					PLAYER.draw(context);
+					if(PLAYER.players.length > 0){
+						for(var i = 0; i < PLAYER.players.length; i++){
+							PLAYER.players[i].draw(context);
+						}
+					}
+				}
 				
 				//-----------------
 				requestAnimationFrame(update);
 			}
 		};
 			
-		socket.on('players', function(data){
-			console.log(data.id);
+		socket.on('playerCreated', function(data){
+			PLAYER = player.create(data.id);
+			PLAYER.x = data.x;
+			PLAYER.y = data.y;
+			PLAYER.color = data.color;
 		});
+			
+		socket.on('update', function(data){
+			PLAYER.players = [];
+			for(var i = 0; i < data.length; i++){
+				console.log(data[i].id);
+				if(data[i].id === PLAYER.id){
+					PLAYER.x = data[i].x;
+					PLAYER.y = data[i].y;
+					PLAYER.color = data[i].color;
+				} else {
+					var p = player.create(data[i].id);
+					p.x = data[i].x;
+					p.y = data[i].y;
+					p.color = data[i].color;
+					PLAYER.players.push(p);
+				}
+			}
+			
+			console.log(PLAYER);
+			console.log(PLAYER.players);
+		});
+			
+		document.onkeydown = function(event){
+			if(event.keyCode === 68)  //d
+				socket.emit('keypress', {inputId: 'right', state: true});
+			if(event.keyCode === 83)  //s
+				socket.emit('keypress', {inputId: 'down', state: true});
+			if(event.keyCode === 65)  //a
+				socket.emit('keypress', {inputId: 'left', state: true});
+			if(event.keyCode === 87)  //w
+				socket.emit('keypress', {inputId: 'up', state: true});
+		}
+		
+		document.onkeyup = function(event){
+			if(event.keyCode === 68)  //d
+				socket.emit('keypress', {inputId: 'right', state: false});
+			if(event.keyCode === 83)  //s
+				socket.emit('keypress', {inputId: 'down', state: false});
+			if(event.keyCode === 65)  //a
+				socket.emit('keypress', {inputId: 'left', state: false});
+			if(event.keyCode === 87)  //w
+				socket.emit('keypress', {inputId: 'up', state: false});
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 </script>
 	</body>
 </html>
