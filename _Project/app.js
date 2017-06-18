@@ -143,6 +143,12 @@ io.sockets.on('connection', function(socket){
 
 
 setInterval(function(){
+	updateRooms();
+	updatePlayers();
+}, 1000 / 25);
+
+
+updatePlayers = function(){
 	for(var i in PLAYER_LIST){
 		var player = PLAYER_LIST[i];
 		player.updatePosition();
@@ -169,7 +175,32 @@ setInterval(function(){
 				}
 			}
 		}
-		
 		player.socket.emit('update', pack);
 	}
-}, 1000 / 25);
+}
+
+updateRooms = function(){
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
