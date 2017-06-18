@@ -124,7 +124,6 @@ io.sockets.on('connection', function(socket){
 	});
 	
 	socket.on('join', function(data){
-		console.log('join');
 		for(var i in PLAYER_LIST){
 			var player = PLAYER_LIST[i];
 			player.roomId = '1';
