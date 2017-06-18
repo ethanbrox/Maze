@@ -52,6 +52,13 @@ var Player = {
 		}
 	},
 	
+	switchRooms: function(){
+		this.x = 250;
+		this.y = 250;
+		
+		
+	},
+	
 };
 
 var Room = {
@@ -126,7 +133,7 @@ io.sockets.on('connection', function(socket){
 	socket.on('join', function(data){
 		for(var i in PLAYER_LIST){
 			var player = PLAYER_LIST[i];
-			player.roomId = '1';
+			//player.roomId = '1';
 		}
 	});
 });
@@ -143,7 +150,8 @@ setInterval(function(){
 		pack.push({
 			x:player.x,
 			y:player.y,
-			color:player.color
+			color:player.color,
+			roomColor: ROOM_LIST[player.roomId].color
 		});
 		
 		for(var k in PLAYER_LIST){
@@ -154,7 +162,8 @@ setInterval(function(){
 						pack.push({
 							x:p.x,
 							y:p.y,
-							color:p.color
+							color:p.color,
+							roomColor: ROOM_LIST[player.roomId].color
 						});
 					}
 				}
