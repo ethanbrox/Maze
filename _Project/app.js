@@ -12,7 +12,12 @@ app.use('/client', express.static(__dirname + '/client'));
 serv.listen(2000);
 console.log('server started');
 
+
+
+
+
 var PLAYER_LIST = {};
+var ROOM_LIST = {};
 
 var Player = {
 	socket: null,
@@ -49,9 +54,25 @@ var Player = {
 	
 };
 
+var Room = {
+	id: null,
+	numPlayers:0,
+	color:'black',
+	
+	create: function(){
+		var obj = Object.create(this);
+		return obj;
+	},
+};
+
+
+
+
+
 var io = require('socket.io')(serv,{});
 io.sockets.on('connection', function(socket){
 	
+	//Create the socket and Player, add the socket to the Player
 	socket.id = Math.random();
 	var player = Player.create();
 	player.id = socket.id;
@@ -63,8 +84,29 @@ io.sockets.on('connection', function(socket){
       	Math.floor(Math.random()*256)+')';
 	player.color = color;
 	
+	//add the player to the list of players
 	PLAYER_LIST[socket.id] = player;
 	console.log("player Created: " + player.id);
+	
+	//Create a Room and add the id to the player
+	var room = Room.create();
+	room.id = Math.random();
+	room.numPlayers = 1;
+	
+	color = 'rgb('+
+		Math.floor(Math.random()*256)+','+
+      	Math.floor(Math.random()*256)+','+
+      	Math.floor(Math.random()*256)+')';
+	room.color = color;
+	
+	//add the room to the list
+	ROOM_LIST[room.id] = room;
+	//add the room id to the player
+	player.roomId = room.id;
+	
+	
+	
+	
 	
 	socket.on('disconnect', function(){
 		delete PLAYER_LIST[socket.id];
@@ -89,6 +131,10 @@ io.sockets.on('connection', function(socket){
 		}
 	});
 });
+
+
+
+
 
 setInterval(function(){
 	for(var i in PLAYER_LIST){
