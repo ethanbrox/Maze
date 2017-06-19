@@ -2,9 +2,9 @@
 
 <html>
 	<head>
-		<script src=
-			"https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js">
-		</script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js"></script>
+		<script src="client/js/Player.js"></script>
+		<script src="client/js/Room.js"></script>
 		<style>
 			html, body{
 				margin: 0px;
@@ -29,44 +29,63 @@
 			
 			var colWidth = width / cols;
 			var rowHeight = height / rows;
+			var PLAYER_LIST = [];
+			var ROOM = {};
 			
-			socket.on('update', function(data){
+			socket.on('updatePlayers', function(data){
+				//empty the player list
+				PLAYER_LIST = [];
+				
+				//fill the list with the new players
+				for(var i = 0; i < data.length; i++){
+					var player = Player.create();
+					player.x = data[i].x;
+					player.y = data[i].y;
+					player.color = data[i].color;
+					player.roomColor = data[i].roomColor;
+					PLAYER_LIST.push(player);
+				}
 				
 				//clear the screen
 				ctx.clearRect(0, 0, width, height);
 				
-				//draw the players
-				for(var i = 0; i < data.length; i++){
-					//draw the background
-					var x = 0;
-					var y = 0;
-					var swap = true;
-					for(var j = 0; j < rows; j++){
-						for(var k = 0; k < cols; k++){
-							if(swap){
-								ctx.fillStyle = data[i].roomColor;
-								swap = false;
-							} else if(!swap){
-								ctx.fillStyle = 'white';
-								swap = true;
-							}
-
-							ctx.fillRect(x, y, colWidth, rowHeight);
-							x += colWidth;
+				//draw the background
+				var x = 0;
+				var y = 0;
+				var swap = true;
+				for(var j = 0; j < rows; j++){
+					for(var k = 0; k < cols; k++){
+						if(swap){
+							ctx.fillStyle = ROOM.color;
+							swap = false;
+						} else if(!swap){
+							ctx.fillStyle = 'white';
+							swap = true;
 						}
-						y += rowHeight;
-						x = 0;
-					}	
-					
-					//Draw the player
+
+						ctx.fillRect(x, y, colWidth, rowHeight);
+						x += colWidth;
+					}
+					y += rowHeight;
+					x = 0;
+				}
+				
+				//draw the players
+				for(var i = 0; i < PLAYER_LIST.length; i++){
+					var player = PLAYER_LIST[i];
 					ctx.beginPath();
-					ctx.arc(data[i].x, data[i].y, 25, 0, 2*Math.PI, false);
-					ctx.fillStyle = data[i].color;
+					ctx.fillStyle = player.color;
+					ctx.arc(player.x, player.y, 25, 0, 2*Math.PI, false);
 					ctx.fill();
 				}
 				
 				//check if the player is off the screen
 				
+			});
+			
+			socket.on('updateRooms', function(data){
+				ROOM = Room.create();
+				ROOM.color = data.color;
 			});
 			
 			window.addEventListener('keydown', function(event){

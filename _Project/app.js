@@ -52,6 +52,20 @@ var Player = {
 		}
 	},
 	
+	getData: function(){
+		var r = {
+			x:this.x,
+			y:this.y,
+			color:this.color,
+			roomColor: 'black'
+		};
+		
+		if(this.roomId != null){
+			r.roomColor = ROOM_LIST[this.roomId].color
+		}
+		return r;
+	},
+	
 	switchRooms: function(){
 		this.x = 250;
 		this.y = 250;
@@ -70,6 +84,11 @@ var Room = {
 		var obj = Object.create(this);
 		return obj;
 	},
+	
+	getData: function(){
+		var r = {roomColor: this.color};
+		return r;
+	}
 };
 
 
@@ -91,11 +110,6 @@ io.sockets.on('connection', function(socket){
       	Math.floor(Math.random()*256)+')';
 	player.color = color;
 	
-	//add the player to the list of players
-	PLAYER_LIST[socket.id] = player;
-	console.log("player Created: " + player.id);
-	
-	//Create a Room and add the id to the player
 	var room = Room.create();
 	room.id = Math.random();
 	room.numPlayers = 1;
@@ -110,6 +124,12 @@ io.sockets.on('connection', function(socket){
 	ROOM_LIST[room.id] = room;
 	//add the room id to the player
 	player.roomId = room.id;
+	
+	//add the player to the list of players
+	PLAYER_LIST[socket.id] = player;
+	console.log("player Created: " + player.id);
+	
+	//Create a Room and add the id to the player
 	
 	
 	
@@ -131,10 +151,27 @@ io.sockets.on('connection', function(socket){
 	});
 	
 	socket.on('join', function(data){
+		var room = Room.create();
+		room.id = Math.random();
+		
+		color = 'rgb('+
+			Math.floor(Math.random()*256)+','+
+			Math.floor(Math.random()*256)+','+
+			Math.floor(Math.random()*256)+')';
+		room.color = color;
+		
 		for(var i in PLAYER_LIST){
 			var player = PLAYER_LIST[i];
-			//player.roomId = '1';
+			for(var k in ROOM_LIST){
+				if(ROOM_LIST[k].roomId === player.roomId){
+					ROOM_LIST[k].numPlayers--;
+				}
+			}
+			player.roomId = room.id;
+			room.numPlayers += 1;
 		}
+		
+		ROOM_LIST[room.id] = room;
 	});
 });
 
@@ -153,40 +190,40 @@ updatePlayers = function(){
 		var player = PLAYER_LIST[i];
 		player.updatePosition();
 		var pack = [];
-		pack.push({
-			x:player.x,
-			y:player.y,
-			color:player.color,
-			roomColor: ROOM_LIST[player.roomId].color
-		});
+		pack.push(player.getData());
 		
 		for(var k in PLAYER_LIST){
 			var p = PLAYER_LIST[k];
 			if(p.id != player.id){
 				if(p.roomId != null && player.roomId != null){
 					if(p.roomId == player.roomId){
-						pack.push({
-							x:p.x,
-							y:p.y,
-							color:p.color,
-							roomColor: ROOM_LIST[player.roomId].color
-						});
+						pack.push(p.getData());
 					}
 				}
 			}
 		}
-		player.socket.emit('update', pack);
+		player.socket.emit('updatePlayers', pack);
 	}
 }
 
 updateRooms = function(){
+	for(var i in ROOM_LIST){
+		if(ROOM_LIST[i].numPlayers < 1){
+			delete ROOM_LIST[i];
+		}
+	}
 	
+	for(var i in ROOM_LIST){
+		var room = ROOM_LIST[i];
+		//rooom.update???
+		for(var k in PLAYER_LIST){
+			var player = PLAYER_LIST[k];
+			if(player.roomId == room.id){
+				player.socket.emit('updateRooms', room.getData());
+			}
+		}
+	}
 }
-
-
-
-
-
 
 
 
