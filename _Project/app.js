@@ -1,6 +1,7 @@
 var express = require('express');
 var app = express();
 var serv = require('http').Server(app);
+var gameport = 2000;
 
 //If the query is anything not otherwise specified do this.
 app.get('/', function(req, res){
@@ -9,7 +10,7 @@ app.get('/', function(req, res){
 //If the server specifies something specific but it has to be in the client folder.
 app.use('/client', express.static(__dirname + '/client'));
 
-serv.listen(2000);
+serv.listen(gameport);
 console.log('server started');
 
 
@@ -57,12 +58,7 @@ var Player = {
 			x:this.x,
 			y:this.y,
 			color:this.color,
-			roomColor: 'black'
 		};
-		
-		if(this.roomId != null){
-			r.roomColor = ROOM_LIST[this.roomId].color
-		}
 		return r;
 	},
 	
@@ -86,7 +82,7 @@ var Room = {
 	},
 	
 	getData: function(){
-		var r = {roomColor: this.color};
+		var r = {color: this.color};
 		return r;
 	}
 };
@@ -128,8 +124,6 @@ io.sockets.on('connection', function(socket){
 	//add the player to the list of players
 	PLAYER_LIST[socket.id] = player;
 	console.log("player Created: " + player.id);
-	
-	//Create a Room and add the id to the player
 	
 	
 	

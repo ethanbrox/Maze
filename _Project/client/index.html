@@ -19,19 +19,63 @@
 		<canvas id="canvas"></canvas>
 		<script>
 			var socket = io();
+            
+            //CANVAS VARIABLES
 			var canvas = document.getElementById('canvas');
 			var ctx = canvas.getContext('2d');
 			width = canvas.width = window.innerWidth;
 			height = canvas.height = window.innerHeight;
-			
 			var cols = 15;
 			var rows = 9;
-			
 			var colWidth = width / cols;
 			var rowHeight = height / rows;
+            
+            //PLAYER_LIST is a list of objects
 			var PLAYER_LIST = [];
+            //ROOM is only an object, a player can only be in one room at a time.
 			var ROOM = {};
-			
+            
+            //RENDER LOOP FOR THE GAME
+            var draw = function(){
+                ctx.clearRect(0, 0, width, height);
+                
+                //draw the background
+                var x = 0;
+                var y = 0;
+                var swap = true;
+                for(var j = 0; j < rows; j++){
+                    for(var k = 0; k < cols; k++){
+                        if(swap){
+                            ctx.fillStyle = ROOM.color;
+                            swap = false;
+                        } else if(!swap){
+                            ctx.fillStyle = 'white';
+                            swap = true;
+                        }
+                        ctx.fillRect(x, y, colWidth, rowHeight);
+                        x += colWidth;
+                    }
+                    y += rowHeight;
+                    x = 0;
+                }
+
+                //draw the players
+				for(var i = 0; i < PLAYER_LIST.length; i++){
+					var player = PLAYER_LIST[i];
+					ctx.beginPath();
+					ctx.fillStyle = player.color;
+					ctx.arc(player.x, player.y, 25, 0, 2*Math.PI, false);
+					ctx.fill();
+				}
+                
+                window.requestAnimationFrame(draw);
+				
+            }
+            
+            
+            
+            
+			//UPDATE GAME INFORMATION
 			socket.on('updatePlayers', function(data){
 				//empty the player list
 				PLAYER_LIST = [];
@@ -42,41 +86,7 @@
 					player.x = data[i].x;
 					player.y = data[i].y;
 					player.color = data[i].color;
-					player.roomColor = data[i].roomColor;
 					PLAYER_LIST.push(player);
-				}
-				
-				//clear the screen
-				ctx.clearRect(0, 0, width, height);
-				
-				//draw the background
-				var x = 0;
-				var y = 0;
-				var swap = true;
-				for(var j = 0; j < rows; j++){
-					for(var k = 0; k < cols; k++){
-						if(swap){
-							ctx.fillStyle = ROOM.color;
-							swap = false;
-						} else if(!swap){
-							ctx.fillStyle = 'white';
-							swap = true;
-						}
-
-						ctx.fillRect(x, y, colWidth, rowHeight);
-						x += colWidth;
-					}
-					y += rowHeight;
-					x = 0;
-				}
-				
-				//draw the players
-				for(var i = 0; i < PLAYER_LIST.length; i++){
-					var player = PLAYER_LIST[i];
-					ctx.beginPath();
-					ctx.fillStyle = player.color;
-					ctx.arc(player.x, player.y, 25, 0, 2*Math.PI, false);
-					ctx.fill();
 				}
 				
 				//check if the player is off the screen
@@ -84,10 +94,15 @@
 			});
 			
 			socket.on('updateRooms', function(data){
+                ROOM = {};
 				ROOM = Room.create();
 				ROOM.color = data.color;
 			});
-			
+            
+            
+            
+            
+			//LISTEN FOR PLAYER INPUT
 			window.addEventListener('keydown', function(event){
 				if(event.keyCode === 68)  //d
 					socket.emit('keypress', {inputId: 'right', state: true});
@@ -111,6 +126,9 @@
 				if(event.keyCode === 87)  //w
 					socket.emit('keypress', {inputId: 'up', state: false});
 			});
+            
+            //call the initial draw method to start rendering the game
+            draw();
 			
 		</script>
 	</body>

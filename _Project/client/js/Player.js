@@ -2,7 +2,6 @@ var Player = {
 	x: 50,
 	y: 50,
 	color: 'black',
-	roomColor: 'black',
 	
 	create: function(){
 		var obj = Object.create(this);
