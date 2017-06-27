@@ -13,7 +13,7 @@ app.use('/client', express.static(__dirname + '/client'));
 serv.listen(gameport);
 console.log('server started');
 
-//I added something to test Branches
+
 
 
 
@@ -61,20 +61,14 @@ var Player = {
 		};
 		return r;
 	},
-	
-	switchRooms: function(){
-		this.x = 250;
-		this.y = 250;
-		
-		
-	},
-	
 };
 
 var Room = {
 	id: null,
 	numPlayers:0,
 	color:'black',
+    width: 200,
+    height: 200,
 	
 	create: function(){
 		var obj = Object.create(this);
@@ -82,7 +76,11 @@ var Room = {
 	},
 	
 	getData: function(){
-		var r = {color: this.color};
+		var r = {
+            color: this.color,
+            width: this.width,
+            height: this.height,
+        };
 		return r;
 	}
 };
