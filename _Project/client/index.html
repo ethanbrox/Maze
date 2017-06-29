@@ -51,6 +51,9 @@
 		//ROOM is only an object, a player can only be in one room at a time.
 		var ROOM = {};
 
+		var Img = new Image();
+		Img.src = 'client/res/cobble.png';
+		
 		//RENDER LOOP FOR THE GAME
 		var draw = function() {
 			//Draw the room
@@ -66,7 +69,8 @@
 						c.fillStyle = 'white';
 						swap = true;
 					}
-					c.fillRect(x, y, colWidth, rowHeight);
+					//c.fillRect(x, y, colWidth, rowHeight);
+					c.drawImage(Img, x, y, colWidth, rowHeight);
 					x += colWidth;
 				}
 				y += rowHeight;
