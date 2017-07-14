@@ -1,4 +1,4 @@
 
-require("./server/server.js");
+require("./server/js/server.js");
 
 var art = 1256;

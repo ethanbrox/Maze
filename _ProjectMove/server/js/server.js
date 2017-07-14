@@ -13,6 +13,9 @@ app.use('/client', express.static(__dirname + '/client'));
 serv.listen(gameport);
 console.log('server started');
 
+var Cell = require("./cell");
+var c = new Cell(1, 2, 5);
+
 var PLAYER_LIST = {};
 var ROOM_LIST = {};
 var GRID = [];
