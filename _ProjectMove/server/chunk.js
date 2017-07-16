@@ -84,6 +84,11 @@ var Chunk = function (i, j, n, cellSize) {
         for (var i = 0; i < this.left.length; i++) {
             this.left[i].wall = this.walls[3];
         }
+        if(this.color === 'black'){
+            for(var i = 0; i < this.cells.length; i++){
+                this.cells[i].color = 'black';
+            }
+        }
     }
 
     this.checkNeighborsNotVisited = function (grid, cols, rows) {
@@ -127,6 +132,47 @@ var Chunk = function (i, j, n, cellSize) {
 
         return neighbors;
     }
+    
+    this.getNeighborsSquare = function (grid, cols, rows) {
+        var neighbors = [];
+
+        var top = grid[util.index(i, j - 1, cols, rows)];
+        var right = grid[util.index(i + 1, j, cols, rows)];
+        var bottom = grid[util.index(i, j + 1, cols, rows)];
+        var left = grid[util.index(i - 1, j, cols, rows)];
+        var topLeft = grid[util.index(i - 1, j - 1, cols, rows)];
+        var topRight = grid[util.index(i + 1, j - 1, cols, rows)];
+        var bottomRight = grid[util.index(i - 1, j + 1, cols, rows)];
+        var bottomLeft = grid[util.index(i + 1, j + 1, cols, rows)];
+
+        if (top) {
+            neighbors.push(top);
+        }
+        if (right) {
+            neighbors.push(right);
+        }
+        if (bottom) {
+            neighbors.push(bottom);
+        }
+        if (left) {
+            neighbors.push(left);
+        }
+        if(topLeft){
+            neighbors.push(topLeft);
+        }
+        if(topRight){
+            neighbors.push(topRight);
+        }
+        if(bottomLeft){
+            neighbors.push(bottomLeft);
+        }
+        if(bottomRight){
+            neighbors.push(bottomRight);
+        }
+
+        return neighbors;
+    }
+
 
     this.getCorners = function () {
         var corners = [];

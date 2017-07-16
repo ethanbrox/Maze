@@ -27,6 +27,8 @@
         var socket = io();
         var id = null;
 
+        var test = false;
+
         socket.on('playerId', function(data) {
             id = data.id;
         });
@@ -56,31 +58,8 @@
                     context.fillStyle = this.color;
                 }
                 context.fillRect(this.x, this.y, this.w, this.w);
-                context.strokeStyle = 'white';
-                context.strokeRect(this.x, this.y, this.w, this.w);
-            }
-        }
-
-        var Tile = {
-            i: 0,
-            j: 0,
-            w: 64,
-            id: 0,
-
-            create: function(i, j, w, id) {
-                var obj = Object.create(this);
-                obj.i = i;
-                obj.j = j;
-                obj.w = w;
-                obj.id = id;
-                return obj;
-            },
-
-            draw: function(context) {
-                context.fillStyle = 'black';
-                context.font = "25px Georgia";
-                context.strokeRect(this.i * this.w, this.j * this.w, this.w, this.w);
-                context.fillText(this.id, this.i * this.w + 20, this.j * this.w + 37);
+                //context.strokeStyle = 'white';
+                //context.strokeRect(this.x, this.y, this.w, this.w);
             }
         }
 
@@ -102,7 +81,10 @@
 
         //RENDER LOOP FOR THE GAME
         var draw = function() {
+            c.resetTransform();
             c.clearRect(0, 0, width, height);
+            c.fillStyle = 'darkGray';
+            c.fillRect(0, 0, width, height);
             //Draw the room
             /*var x = 0;
             var y = 0;
@@ -124,6 +106,21 @@
             	x = 0;
             }*/
 
+            var disX = 0;
+            var disY = 0;
+            var screenX = Math.floor(canvas.width / 2);
+            var screenY = Math.floor(canvas.height / 2);
+            for (var i = 0; i < PLAYER_LIST.length; i++) {
+                if (PLAYER_LIST[i].id === id) {
+                    disX = (screenX - PLAYER_LIST[i].x);
+                    disY = (screenY - PLAYER_LIST[i].y);
+                }
+            }
+
+            c.translate(disX, disY);
+
+
+
             if (cells.length > 0) {
                 for (var i = 0; i < cells.length; i++) {
                     cells[i].show(c);
@@ -138,6 +135,14 @@
                 c.arc(player.x, player.y, player.radius, 0, 2 * Math.PI, false);
                 c.fill();
             }
+
+            uic.clearRect(0, 0, width, height);
+            var grd = uic.createRadialGradient(width / 2, height / 2, height / 2, width / 2, height / 2, height - 20);
+            grd.addColorStop(0, 'rgba(0, 0, 0, .1)');
+            grd.addColorStop(1, 'rgb(0, 0, 0)');
+
+            uic.fillStyle = grd;
+            uic.fillRect(0, 0, width, height);
 
             window.requestAnimationFrame(draw);
 
@@ -165,7 +170,7 @@
             cells = [];
             for (var i = 0; i < data.length; i++) {
                 var chunk = data[i];
-                for(var j = 0; j < chunk.length; j++){
+                for (var j = 0; j < chunk.length; j++) {
                     var cell = new Cell(chunk[j].x, chunk[j].y, chunk[j].w, chunk[j].wall, chunk[j].color);
                     cells.push(cell);
                 }

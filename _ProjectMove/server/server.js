@@ -21,7 +21,7 @@ console.log('server started');
 var PLAYER_LIST = {};
 var ROOM_LIST = {};
 
-var maze = new Maze(101, 101, 5, 80);
+var maze = new Maze(101, 101, 5, 150);
 maze.createMaze();
 
 var io = require('socket.io')(serv, {});
@@ -29,7 +29,7 @@ io.sockets.on('connection', function (socket) {
 
     //Create the socket and Player, add the socket to the Player
     socket.id = Math.random();
-    var player = new Player(socket, socket.id);
+    var player = new Player(maze, socket, socket.id);
 
     var color = 'rgb(' +
         Math.floor(Math.random() * 256) + ',' +
@@ -78,8 +78,12 @@ updateChunks = function () {
         var socket = player.socket;
         
         var chunk = maze.getChunk(player.x, player.y);
+        var neighbors = chunk.getNeighborsSquare(maze.grid, maze.cols, maze.rows);
         var r = [];
         r.push(chunk.getInfo());
+        for(var i = 0; i < neighbors.length; i++){
+            r.push(neighbors[i].getInfo());
+        }
         if(r){
             socket.emit('map', r);
         }
