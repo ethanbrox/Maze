@@ -3,7 +3,7 @@
 <html>
 
 <head>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
     <script src="client/js/Player.js"></script>
     <script src="client/js/Room.js"></script>
     <style>
@@ -41,6 +41,26 @@
         var colWidth = width / cols;
         var rowHeight = height / rows;
 
+        var Cell = function(x, y, w, wall, color) {
+            this.x = x;
+            this.y = y;
+            this.w = w;
+            this.wall = wall;
+            this.color = color;
+            this.id = null;
+
+            this.show = function(context) {
+                if (this.wall) {
+                    context.fillStyle = 'black';
+                } else {
+                    context.fillStyle = this.color;
+                }
+                context.fillRect(this.x, this.y, this.w, this.w);
+                context.strokeStyle = 'white';
+                context.strokeRect(this.x, this.y, this.w, this.w);
+            }
+        }
+
         var Tile = {
             i: 0,
             j: 0,
@@ -75,6 +95,7 @@
         //ROOM is only an object, a player can only be in one room at a time.
         var ROOM = {};
         var GRID = [];
+        var cells = [];
 
         var Img = new Image();
         Img.src = 'client/res/cobble.png';
@@ -103,9 +124,9 @@
             	x = 0;
             }*/
 
-            if (GRID.length > 0) {
-                for (var i = 0; i < GRID.length; i++) {
-                    GRID[i].draw(c);
+            if (cells.length > 0) {
+                for (var i = 0; i < cells.length; i++) {
+                    cells[i].show(c);
                 }
             }
 
@@ -114,12 +135,13 @@
                 var player = PLAYER_LIST[i];
                 c.beginPath();
                 c.fillStyle = player.color;
-                c.arc(player.x, player.y, 25, 0, 2 * Math.PI, false);
+                c.arc(player.x, player.y, player.radius, 0, 2 * Math.PI, false);
                 c.fill();
             }
 
             window.requestAnimationFrame(draw);
 
+            /*
             //draw the UI
             uic.clearRect(0, 0, width, height);
             uic.fillStyle = "rgba(255, 0, 0, 0.9)";
@@ -136,7 +158,19 @@
 
             uic.fillStyle = 'black';
             //uic.fillText(ROOM.numPlayers, 30, 30);
+            */
         }
+
+        socket.on('map', function(data) {
+            cells = [];
+            for (var i = 0; i < data.length; i++) {
+                var chunk = data[i];
+                for(var j = 0; j < chunk.length; j++){
+                    var cell = new Cell(chunk[j].x, chunk[j].y, chunk[j].w, chunk[j].wall, chunk[j].color);
+                    cells.push(cell);
+                }
+            }
+        });
 
         //UPDATE GAME INFORMATION
         socket.on('updatePlayers', function(data) {
@@ -151,6 +185,7 @@
                 player.y = data[i].y;
                 player.color = data[i].color;
                 player.health = data[i].health;
+                player.radius = data[i].radius;
                 PLAYER_LIST.push(player);
             }
 
