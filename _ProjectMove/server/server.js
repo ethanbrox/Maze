@@ -21,7 +21,7 @@ console.log('server started');
 var PLAYER_LIST = {};
 var ROOM_LIST = {};
 
-var maze = new Maze(101, 101, 5, 150);
+var maze = new Maze(125, 125, 5, 150);
 maze.createMaze();
 
 var io = require('socket.io')(serv, {});

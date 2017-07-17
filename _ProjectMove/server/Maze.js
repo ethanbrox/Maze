@@ -45,7 +45,7 @@ function Maze(rows, cols, chunkSize, cellSize) {
 
         this.current = this.grid[0];
 
-        this.createRooms(2, 2);
+        this.createRooms(2, 3);
         this.clearOutRooms();
         this.createDoors();
 
@@ -82,7 +82,7 @@ function Maze(rows, cols, chunkSize, cellSize) {
      *Creates the rooms in the grid and adds all new room id's to the rooms array.
      */
     this.createRooms = function (width, height) {
-        var tries = 300;
+        var tries = 500;
         var count = 0;
 
         while (count < tries) {
@@ -90,6 +90,8 @@ function Maze(rows, cols, chunkSize, cellSize) {
 
             var x = Math.floor(Math.random() * this.cols + 1);
             var y = Math.floor(Math.random() * this.rows + 1);
+            //var width = Math.ceil(Math.random() * w);
+            //var height = Math.ceil(Math.random() * h);
             if (x + width < this.cols && y + height < this.rows) {
                 var valid = true;
                 for (var i = -1; i < width + 1; i++) {
@@ -110,6 +112,9 @@ function Maze(rows, cols, chunkSize, cellSize) {
                             if (chunk) {
                                 chunk.visited = true;
                                 chunk.roomId = id;
+                                for(var h = 0; h < chunk.cells.length; h++){
+                                    chunk.cells[h].color = 'gray';
+                                }
                             }
                         }
                     }
